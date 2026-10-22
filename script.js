@@ -1,3 +1,4 @@
+
 const $ = id => document.getElementById(id);
 
 const LOGIN_EMAIL = "pandak";
@@ -5,6 +6,8 @@ const LOGIN_PASSWORD = "sitaw";
 const LOGIN_STORAGE_KEY = "nightfall_logged_in";
 const TOTAL_PUMPKINS = 11;
 const WORLD_WIDTH = 2920;
+const VIEW_WIDTH = 960;
+const VIEW_HEIGHT = 440;
 
 const loginScreen = $("loginCard");
 const loadingScreen = $("loadingScreen");
@@ -53,7 +56,7 @@ const hunterSprite = new Image();
 hunterSprite.src = "hunter.webp";
 
 hunterSprite.onerror = () => {
-  console.error("Could not load hunter.webp. Check the filename and location.");
+  console.error("Could not load hunter.webp. Check its filename and location.");
 };
 
 const hunterAnimation = {
@@ -64,7 +67,13 @@ const hunterAnimation = {
   frameRate: 9,
   animations: {
     idle: { frames: [{ x: 0, y: 0 }] },
-    walk: { frames: [{ x: 0, y: 0 }, { x: 40, y: 0 }, { x: 80, y: 0 }] },
+    walk: {
+      frames: [
+        { x: 0, y: 0 },
+        { x: 40, y: 0 },
+        { x: 80, y: 0 }
+      ]
+    },
     jump: { frames: [{ x: 0, y: 0 }] },
     shoot: { frames: [{ x: 0, y: 0 }] },
     hurt: { frames: [{ x: 0, y: 0 }] },
@@ -79,11 +88,11 @@ logoutButton.textContent = "↪ LOG OUT";
 
 Object.assign(logoutButton.style, {
   position: "fixed",
-  top: "18px",
-  right: "18px",
+  top: "8px",
+  right: "8px",
   zIndex: "99999",
   display: "none",
-  padding: "12px 18px",
+  padding: "8px 12px",
   border: "1px solid rgba(255,255,255,.25)",
   borderRadius: "10px",
   background: "#6d244c",
@@ -171,6 +180,46 @@ let touchRight = false;
 let touchJump = false;
 let jumpQueued = false;
 
+let resizeFrame = null;
+
+function configureCanvas() {
+  if (!canvas || !ctx) return;
+
+  canvas.width = VIEW_WIDTH;
+  canvas.height = VIEW_HEIGHT;
+
+  canvas.style.display = "block";
+  canvas.style.maxWidth = "100%";
+  canvas.style.touchAction = "none";
+
+  drawGame();
+}
+
+function resizeGame() {
+  if (resizeFrame !== null) {
+    cancelAnimationFrame(resizeFrame);
+  }
+
+  resizeFrame = requestAnimationFrame(() => {
+    resizeFrame = null;
+
+    if (!canvas || !ctx) return;
+
+    if (canvas.width !== VIEW_WIDTH || canvas.height !== VIEW_HEIGHT) {
+      canvas.width = VIEW_WIDTH;
+      canvas.height = VIEW_HEIGHT;
+    }
+
+    if (gameRunning) {
+      drawGame();
+    } else if (player && platforms.length) {
+      drawGame();
+    }
+
+    updateRotateScreen();
+  });
+}
+
 function hasSavedLogin() {
   try {
     return localStorage.getItem(LOGIN_STORAGE_KEY) === "true";
@@ -195,17 +244,26 @@ function updateLogoutButton() {
 
 function showScreen(screen) {
   if (!screen) return;
+
   screen.hidden = false;
   screen.classList.add("active");
   screen.setAttribute("aria-hidden", "false");
+
+  if (screen === gameScreen) {
+    configureCanvas();
+    resizeGame();
+  }
+
   updateRotateScreen();
 }
 
 function hideScreen(screen) {
   if (!screen) return;
+
   screen.classList.remove("active");
   screen.hidden = true;
   screen.setAttribute("aria-hidden", "true");
+
   updateRotateScreen();
 }
 
@@ -246,6 +304,7 @@ function stopEndingAnimation() {
 
 function showMessage(text, type = "error") {
   if (!message) return;
+
   message.textContent = text;
   message.className = `message ${type}`;
 }
@@ -259,6 +318,7 @@ function setProgress(value, description, status) {
 
 function resetLoginButton() {
   if (!loginButton) return;
+
   loginButton.disabled = false;
   loginButton.innerHTML = "<span>LOG IN</span><span>☠</span>";
 }
@@ -266,6 +326,7 @@ function resetLoginButton() {
 if (togglePassword && passwordInput) {
   togglePassword.addEventListener("click", () => {
     const showing = passwordInput.type === "password";
+
     passwordInput.type = showing ? "text" : "password";
     togglePassword.textContent = showing ? "Hide" : "👁";
     togglePassword.setAttribute(
@@ -331,7 +392,11 @@ function runLoadingSequence() {
   let index = 0;
 
   function nextStep() {
-    if (runId !== loadingRunId || !loadingScreen || loadingScreen.hidden) {
+    if (
+      runId !== loadingRunId ||
+      !loadingScreen ||
+      loadingScreen.hidden
+    ) {
       return;
     }
 
@@ -359,6 +424,7 @@ function runLoadingSequence() {
 function updateDifficultyButtons() {
   difficultyButtons.forEach(button => {
     const selected = button.dataset.difficulty === selectedDifficulty;
+
     button.classList.toggle("selected", selected);
     button.setAttribute("aria-pressed", String(selected));
   });
@@ -386,6 +452,7 @@ function showDifficultySelection() {
 difficultyButtons.forEach(button => {
   button.addEventListener("click", () => {
     const selected = button.dataset.difficulty;
+
     if (!difficultySettings[selected]) return;
 
     selectedDifficulty = selected;
@@ -397,6 +464,7 @@ difficultyButtons.forEach(button => {
 function updateCharacterButtons() {
   characterButtons.forEach(button => {
     const selected = button.dataset.character === selectedCharacter;
+
     button.classList.toggle("selected", selected);
     button.setAttribute("aria-pressed", String(selected));
   });
@@ -431,6 +499,7 @@ function showCharacterSelection() {
 characterButtons.forEach(button => {
   button.addEventListener("click", () => {
     const selected = button.dataset.character;
+
     if (!characterSettings[selected]) return;
 
     selectedCharacter = selected;
@@ -449,6 +518,7 @@ if (confirmCharacterButton) {
       if (characterHint) {
         characterHint.textContent = "Please select a character first.";
       }
+
       return;
     }
 
@@ -465,8 +535,13 @@ if (backToDifficultyButton) {
 }
 
 function startGame(chosenDifficulty = "normal", chosenCharacter = "hunter") {
-  if (!difficultySettings[chosenDifficulty]) chosenDifficulty = "normal";
-  if (!characterSettings[chosenCharacter]) chosenCharacter = "hunter";
+  if (!difficultySettings[chosenDifficulty]) {
+    chosenDifficulty = "normal";
+  }
+
+  if (!characterSettings[chosenCharacter]) {
+    chosenCharacter = "hunter";
+  }
 
   stopGame();
   stopEndingAnimation();
@@ -487,8 +562,11 @@ function startGame(chosenDifficulty = "normal", chosenCharacter = "hunter") {
   hideScreen(endingScreen);
 
   showScreen(gameScreen);
+  configureCanvas();
 
-  if (currentDifficulty) currentDifficulty.textContent = difficulty.name;
+  if (currentDifficulty) {
+    currentDifficulty.textContent = difficulty.name;
+  }
 
   updateCharacterHUD();
 
@@ -510,6 +588,7 @@ function startGame(chosenDifficulty = "normal", chosenCharacter = "hunter") {
 
   gameRunning = true;
   lastTime = 0;
+  drawGame();
   animationFrame = requestAnimationFrame(gameLoop);
 }
 
@@ -524,10 +603,16 @@ function updateCharacterHUD() {
     badge.className = "stat character-stat";
 
     const stats = gameScreen.querySelector(".game-stats");
-    if (stats) stats.insertBefore(badge, restartButton || null);
+
+    if (stats) {
+      stats.insertBefore(badge, restartButton || null);
+    }
   }
 
   const character = characterSettings[selectedCharacter];
+
+  if (!character) return;
+
   badge.textContent = `${character.emoji} ${character.name}`;
   badge.style.borderColor = character.color;
 }
@@ -594,15 +679,25 @@ function resetGame() {
     { x: 2600, y: 290, min: 2550, max: 2780, dir: 1 }
   ];
 
-  exitPortal = { x: 2770, y: 260, width: 48, height: 80 };
+  exitPortal = {
+    x: 2770,
+    y: 260,
+    width: 48,
+    height: 80
+  };
 
   clearInputs();
   updateHUD();
 }
 
 function updateHUD() {
-  if (pumpkinCount) pumpkinCount.textContent = `${score} / ${TOTAL_PUMPKINS}`;
-  if (livesCount) livesCount.textContent = lives;
+  if (pumpkinCount) {
+    pumpkinCount.textContent = `${score} / ${TOTAL_PUMPKINS}`;
+  }
+
+  if (livesCount) {
+    livesCount.textContent = lives;
+  }
 }
 
 function gameLoop(timestamp) {
@@ -616,6 +711,7 @@ function gameLoop(timestamp) {
     : 1;
 
   lastTime = timestamp;
+
   updateGame(delta);
 
   if (gameRunning) {
@@ -631,8 +727,13 @@ function updateGame(delta) {
 
   const left = Boolean(keys.ArrowLeft || keys.KeyA || touchLeft);
   const right = Boolean(keys.ArrowRight || keys.KeyD || touchRight);
+
   const jumping = Boolean(
-    keys.Space || keys.ArrowUp || keys.KeyW || jumpQueued || touchJump
+    keys.Space ||
+    keys.ArrowUp ||
+    keys.KeyW ||
+    jumpQueued ||
+    touchJump
   );
 
   player.vx = 0;
@@ -731,7 +832,7 @@ function updateGame(delta) {
     }
   }
 
-  if (player.y > canvas.height + 120) {
+  if (player.y > VIEW_HEIGHT + 120) {
     lives--;
     updateHUD();
 
@@ -763,7 +864,10 @@ function updateGame(delta) {
 
   cameraX = Math.max(
     0,
-    Math.min(player.x - canvas.width * 0.35, WORLD_WIDTH - canvas.width)
+    Math.min(
+      player.x - VIEW_WIDTH * 0.35,
+      WORLD_WIDTH - VIEW_WIDTH
+    )
   );
 }
 
@@ -797,7 +901,8 @@ function updateHunterAnimation(delta) {
 
       if (player.animationTime >= frameDuration) {
         player.animationTime = 0;
-        player.animationFrame = (player.animationFrame + 1) % frames.length;
+        player.animationFrame =
+          (player.animationFrame + 1) % frames.length;
       }
     }
   }
@@ -806,14 +911,15 @@ function updateHunterAnimation(delta) {
 function drawGame() {
   if (!ctx || !canvas || !player) return;
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 
-  const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  const sky = ctx.createLinearGradient(0, 0, 0, VIEW_HEIGHT);
   sky.addColorStop(0, "#100d2b");
   sky.addColorStop(1, "#37204e");
 
   ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 
   drawStars();
   drawBackgroundHills();
@@ -824,10 +930,14 @@ function drawGame() {
   platforms.forEach(drawPlatform);
 
   pumpkins.forEach(pumpkin => {
-    if (!pumpkin.collected) drawPumpkin(pumpkin.x, pumpkin.y);
+    if (!pumpkin.collected) {
+      drawPumpkin(pumpkin.x, pumpkin.y);
+    }
   });
 
-  ghosts.forEach(ghost => drawGhost(ghost.x, ghost.y, ghost.dir));
+  ghosts.forEach(ghost => {
+    drawGhost(ghost.x, ghost.y, ghost.dir);
+  });
 
   drawPortal();
   drawPlayer();
@@ -836,6 +946,7 @@ function drawGame() {
 
   ctx.fillStyle = "rgba(8,5,22,.75)";
   ctx.fillRect(12, 12, 210, 34);
+
   ctx.fillStyle = "#fff";
   ctx.font = "bold 13px Arial";
   ctx.fillText("FIND THE EXIT PORTAL", 24, 34);
@@ -843,7 +954,7 @@ function drawGame() {
 
 function drawStars() {
   for (let i = 0; i < 45; i++) {
-    const x = (i * 83 + 21) % canvas.width;
+    const x = (i * 83 + 21) % VIEW_WIDTH;
     const y = (i * 47 + 13) % 180;
 
     ctx.fillStyle = i % 3 === 0 ? "#ffd875" : "#fff";
@@ -859,24 +970,24 @@ function drawBackgroundHills() {
   ctx.beginPath();
   ctx.moveTo(0, 280);
 
-  for (let x = 0; x <= canvas.width + 80; x += 80) {
+  for (let x = 0; x <= VIEW_WIDTH + 80; x += 80) {
     ctx.lineTo(x, 230 + Math.sin(x * 0.02) * 30);
   }
 
-  ctx.lineTo(canvas.width, canvas.height);
-  ctx.lineTo(0, canvas.height);
+  ctx.lineTo(VIEW_WIDTH, VIEW_HEIGHT);
+  ctx.lineTo(0, VIEW_HEIGHT);
   ctx.fill();
 
   ctx.fillStyle = "#171029";
   ctx.beginPath();
   ctx.moveTo(0, 320);
 
-  for (let x = 0; x <= canvas.width + 80; x += 80) {
+  for (let x = 0; x <= VIEW_WIDTH + 80; x += 80) {
     ctx.lineTo(x, 285 + Math.cos(x * 0.018) * 22);
   }
 
-  ctx.lineTo(canvas.width, canvas.height);
-  ctx.lineTo(0, canvas.height);
+  ctx.lineTo(VIEW_WIDTH, VIEW_HEIGHT);
+  ctx.lineTo(0, VIEW_HEIGHT);
   ctx.fill();
 }
 
@@ -889,7 +1000,11 @@ function drawPlatform(platform) {
 
   ctx.fillStyle = "rgba(0,0,0,.2)";
 
-  for (let x = platform.x + 8; x < platform.x + platform.w; x += 28) {
+  for (
+    let x = platform.x + 8;
+    x < platform.x + platform.w;
+    x += 28
+  ) {
     ctx.fillRect(x, platform.y + 15, 14, 3);
   }
 }
@@ -941,7 +1056,11 @@ function drawGhost(x, y, direction) {
 }
 
 function drawHunter() {
-  if (!player || !hunterSprite.complete || hunterSprite.naturalWidth === 0) {
+  if (
+    !player ||
+    !hunterSprite.complete ||
+    hunterSprite.naturalWidth === 0
+  ) {
     return false;
   }
 
@@ -954,10 +1073,6 @@ function drawHunter() {
     Math.min(player.animationFrame, frames.length - 1)
   ];
 
-  const sourceX = frame.x;
-  const sourceY = frame.y;
-  const sourceWidth = hunterAnimation.frameWidth;
-  const sourceHeight = hunterAnimation.frameHeight;
   const drawWidth = hunterAnimation.drawWidth;
   const drawHeight = hunterAnimation.drawHeight;
   const drawX = player.x - (drawWidth - player.width) / 2;
@@ -971,10 +1086,10 @@ function drawHunter() {
 
     ctx.drawImage(
       hunterSprite,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight,
+      frame.x,
+      frame.y,
+      hunterAnimation.frameWidth,
+      hunterAnimation.frameHeight,
       0,
       0,
       drawWidth,
@@ -983,10 +1098,10 @@ function drawHunter() {
   } else {
     ctx.drawImage(
       hunterSprite,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight,
+      frame.x,
+      frame.y,
+      hunterAnimation.frameWidth,
+      hunterAnimation.frameHeight,
       drawX,
       drawY,
       drawWidth,
@@ -1026,7 +1141,12 @@ function drawPlayer() {
   ctx.fillRect(x + 1, y + 5, 7, 8);
 
   ctx.fillStyle = "#fff";
-  ctx.fillRect(x + (player.facing === 1 ? 17 : 7), y + 10, 5, 5);
+  ctx.fillRect(
+    x + (player.facing === 1 ? 17 : 7),
+    y + 10,
+    5,
+    5
+  );
 
   ctx.fillStyle = character.outfit;
   ctx.fillRect(x + 5, y + 21, 21, 13);
@@ -1124,7 +1244,8 @@ function showGameResult(won, titleText, descriptionText) {
   if (eyebrow) eyebrow.textContent = won ? "QUEST COMPLETE" : "GAME OVER";
 
   if (finalScore) {
-    finalScore.textContent = `Pumpkins collected: ${score} / ${TOTAL_PUMPKINS}`;
+    finalScore.textContent =
+      `Pumpkins collected: ${score} / ${TOTAL_PUMPKINS}`;
   }
 }
 
@@ -1171,7 +1292,8 @@ function showEndingScreen() {
   const endingScore = $("endingScore");
 
   if (endingScore) {
-    endingScore.textContent = `${score} / ${TOTAL_PUMPKINS} pumpkins collected`;
+    endingScore.textContent =
+      `${score} / ${TOTAL_PUMPKINS} pumpkins collected`;
   }
 
   startEndingAnimation();
@@ -1203,7 +1325,12 @@ function startEndingAnimation() {
       return;
     }
 
-    endingCtx.clearRect(0, 0, endingCanvas.width, endingCanvas.height);
+    endingCtx.clearRect(
+      0,
+      0,
+      endingCanvas.width,
+      endingCanvas.height
+    );
 
     for (const particle of particles) {
       particle.y += particle.speed;
@@ -1260,7 +1387,10 @@ if (playAgainButton) {
 }
 
 if (endingPlayAgainButton) {
-  endingPlayAgainButton.addEventListener("click", replayAtDifficultySelection);
+  endingPlayAgainButton.addEventListener(
+    "click",
+    replayAtDifficultySelection
+  );
 }
 
 function bindHoldButton(button, setter) {
@@ -1297,19 +1427,27 @@ bindHoldButton(rightButton, value => {
 
 bindHoldButton(jumpButton, value => {
   touchJump = value;
-  if (value) jumpQueued = true;
+
+  if (value) {
+    jumpQueued = true;
+  }
 });
 
 document.addEventListener("keydown", event => {
   if (!gameRunning || gameOver) return;
 
-  if (["ArrowLeft", "ArrowRight", "ArrowUp", "Space"].includes(event.code)) {
+  if (
+    ["ArrowLeft", "ArrowRight", "ArrowUp", "Space"].includes(event.code)
+  ) {
     event.preventDefault();
   }
 
   keys[event.code] = true;
 
-  if (["Space", "ArrowUp", "KeyW"].includes(event.code) && !event.repeat) {
+  if (
+    ["Space", "ArrowUp", "KeyW"].includes(event.code) &&
+    !event.repeat
+  ) {
     jumpQueued = true;
   }
 });
@@ -1321,7 +1459,9 @@ document.addEventListener("keyup", event => {
 window.addEventListener("blur", clearInputs);
 
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) clearInputs();
+  if (document.hidden) {
+    clearInputs();
+  }
 });
 
 function updateRotateScreen() {
@@ -1335,19 +1475,27 @@ function updateRotateScreen() {
   rotateScreen.setAttribute("aria-hidden", String(!shouldShow));
 }
 
-window.addEventListener("resize", () => {
-  if (gameRunning) drawGame();
-  updateRotateScreen();
-});
+function handleViewportChange() {
+  resizeGame();
+}
 
-window.addEventListener("orientationchange", updateRotateScreen);
+window.addEventListener("resize", handleViewportChange);
+window.addEventListener("orientationchange", handleViewportChange);
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", handleViewportChange);
+}
+
+if (screen.orientation && screen.orientation.addEventListener) {
+  screen.orientation.addEventListener("change", handleViewportChange);
+}
 
 const rotateObserver = new MutationObserver(updateRotateScreen);
 
 if (gameScreen) {
   rotateObserver.observe(gameScreen, {
     attributes: true,
-    attributeFilter: ["hidden"]
+    attributeFilter: ["hidden", "class"]
   });
 }
 
@@ -1396,6 +1544,7 @@ function resetToLogin() {
     endingScreen
   ].forEach(screen => {
     if (!screen) return;
+
     screen.hidden = true;
     screen.classList.remove("active");
     screen.setAttribute("aria-hidden", "true");
@@ -1451,6 +1600,7 @@ function restoreSavedLogin() {
     endingScreen
   ].forEach(screen => {
     if (!screen) return;
+
     screen.hidden = true;
     screen.classList.remove("active");
     screen.setAttribute("aria-hidden", "true");
@@ -1480,7 +1630,9 @@ function restoreSavedLogin() {
 }
 
 function initializeNightfall() {
+  configureCanvas();
   restoreSavedLogin();
+  updateRotateScreen();
 }
 
 if (document.readyState === "loading") {
@@ -1492,5 +1644,7 @@ if (document.readyState === "loading") {
 }
 
 window.addEventListener("pageshow", event => {
-  if (event.persisted) initializeNightfall();
+  if (event.persisted) {
+    initializeNightfall();
+  }
 });
