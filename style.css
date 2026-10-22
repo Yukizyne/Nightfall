@@ -1572,6 +1572,12 @@ button:disabled {
     padding: 45px 23px 25px;
   }
 
+  .login-card,
+  .difficulty-card,
+  .character-card {
+    width: min(100%, 100%);
+  }
+
   .moon {
     top: 5%;
     right: -10px;
@@ -1862,6 +1868,40 @@ button:disabled {
 
   .jump-button {
     min-width: 75px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .scene {
+    padding-top: 30px;
+    padding-bottom: 28px;
+  }
+
+  .login-card {
+    max-width: 360px;
+    padding-top: 34px;
+  }
+
+  .login-header {
+    margin-bottom: 18px;
+  }
+
+  .login-header h1 {
+    font-size: 30px;
+  }
+
+  .access-note {
+    margin-top: 14px;
+  }
+
+  .game-screen {
+    gap: 12px;
+  }
+
+  .game-header,
+  .game-controls,
+  .game-intro {
+    width: 100%;
   }
 }
 

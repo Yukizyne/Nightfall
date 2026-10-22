@@ -53,10 +53,11 @@ const characterHint = $("characterHint");
 const rotateScreen = $("rotateScreen");
 
 const hunterSprite = new Image();
-hunterSprite.src = "hunter.webp";
 
+// The sprite is optional. If the asset is not available, the game keeps using
+// the built-in fallback drawing so the page remains functional on every device.
 hunterSprite.onerror = () => {
-  console.error("Could not load hunter.webp. Check its filename and location.");
+  hunterSprite.src = "";
 };
 
 const hunterAnimation = {
