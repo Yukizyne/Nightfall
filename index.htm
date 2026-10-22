@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10091c">
+  <title>Nightfall | Haunted Adventure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js?v=5" defer></script>
+</head>
+<body>
+  <main class="scene">
+    <div class="moon"></div>
+    <div class="bats">🦇</div>
+    <div class="bats bats-two">🦇</div>
+    <div class="fog fog-one"></div>
+    <div class="fog fog-two"></div>
+
+    <div class="castle">
+      <div class="tower tower-left"></div>
+      <div class="tower tower-center"></div>
+      <div class="tower tower-right"></div>
+      <div class="castle-body">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="tree tree-left"></div>
+    <div class="tree tree-right"></div>
+
+    <section class="login-card" id="loginCard">
+      <div class="pumpkin">🎃</div>
+      <header class="login-header">
+        <p class="eyebrow">WELCOME BACK, MORTAL</p>
+        <h1>Enter If You Dare</h1>
+        <p class="subtitle">Your adventure awaits...</p>
+      </header>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Email</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉</span>
+            <input type="text" id="username" placeholder="Enter your email" autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required>
+            <button type="button" class="toggle-password" id="togglePassword" aria-label="Show password">👁</button>
+          </div>
+        </div>
+
+        <p class="message" id="message" role="status" aria-live="polite"></p>
+
+        <button type="submit" class="login-button" id="loginButton">
+          <span>LOG IN</span><span>☠</span>
+        </button>
+      </form>
+
+      <div class="access-note">
+        <span>🎃</span>
+        <div>
+          <p>Eto yung access sa login</p>
+          <p>Email: <strong>pandak</strong></p>
+          <p>Password: <strong>sitaw</strong></p>
+        </div>
+      </div>
+
+      <footer class="login-footer">✦ NO ESCAPE FROM THE NIGHT ✦</footer>
+    </section>
+
+    <section class="loading-screen" id="loadingScreen" aria-hidden="true" hidden>
+      <div class="loading-moon"></div>
+      <div class="loading-content">
+        <div class="loading-pumpkin">🎃</div>
+        <p class="eyebrow">THE GATES ARE OPENING</p>
+        <h2>Entering the<br><span>Haunted World</span></h2>
+        <p class="loading-description" id="loadingDescription">Awakening the spirits...</p>
+        <div class="progress-info">
+          <span>SUMMONING DARKNESS</span>
+          <span id="loadingPercent">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="loading-status" id="loadingStatus">Preparing your nightmare</p>
+      </div>
+      <p class="loading-footer">DON'T LOOK BEHIND YOU</p>
+    </section>
+
+    <section class="difficulty-screen" id="difficultyScreen" aria-hidden="true" hidden>
+      <div class="difficulty-card">
+        <div class="difficulty-pumpkin">🎃</div>
+        <p class="eyebrow">CHOOSE YOUR DESTINY</p>
+        <h1>Select Difficulty</h1>
+        <p class="difficulty-subtitle">How brave are you, mortal?</p>
+
+        <div class="difficulty-options">
+          <button type="button" class="difficulty-option easy-option" data-difficulty="easy">
+            <span class="difficulty-icon">🎃</span>
+            <span class="difficulty-name">EASY</span>
+            <span class="difficulty-description">Slower ghosts · 5 lives</span>
+            <span class="difficulty-detail">For new adventurers</span>
+          </button>
+
+          <button type="button" class="difficulty-option normal-option" data-difficulty="normal">
+            <span class="difficulty-icon">👻</span>
+            <span class="difficulty-name">NORMAL</span>
+            <span class="difficulty-description">Balanced challenge · 3 lives</span>
+            <span class="difficulty-detail">A classic haunted adventure</span>
+          </button>
+
+          <button type="button" class="difficulty-option hard-option" data-difficulty="hard">
+            <span class="difficulty-icon">💀</span>
+            <span class="difficulty-name">HARD</span>
+            <span class="difficulty-description">Faster ghosts · 2 lives</span>
+            <span class="difficulty-detail">Only for the fearless</span>
+          </button>
+        </div>
+
+        <p class="difficulty-hint">Choose carefully. The forest is waiting.</p>
+      </div>
+    </section>
+
+    <section class="character-screen" id="characterScreen" aria-hidden="true" hidden>
+      <div class="character-card">
+        <div class="character-header">
+          <span class="character-pumpkin">🎃</span>
+          <p class="eyebrow">CHOOSE YOUR SURVIVOR</p>
+          <h1>Select Your Character</h1>
+          <p class="character-subtitle">Who will survive the haunted forest?</p>
+        </div>
+
+        <div class="character-options">
+          <button type="button" class="character-option" data-character="hunter" aria-pressed="false">
+            <div class="character-image hunter-image">
+              <span>🏹</span>
+            </div>
+            <span class="character-name">HUNTER</span>
+            <span class="character-description">Brave, fearless, and ready to fight.</span>
+            <span class="character-select-label">SELECT HUNTER</span>
+          </button>
+
+          <button type="button" class="character-option" data-character="witch" aria-pressed="false">
+            <div class="character-image witch-image">
+              <span>🧙‍♀️</span>
+            </div>
+            <span class="character-name">WITCH</span>
+            <span class="character-description">A mysterious master of dark magic.</span>
+            <span class="character-select-label">SELECT WITCH</span>
+          </button>
+
+          <button type="button" class="character-option" data-character="vampire" aria-pressed="false">
+            <div class="character-image vampire-image">
+              <span>🧛</span>
+            </div>
+            <span class="character-name">VAMPIRE</span>
+            <span class="character-description">A creature who belongs to the night.</span>
+            <span class="character-select-label">SELECT VAMPIRE</span>
+          </button>
+        </div>
+
+        <p class="character-hint" id="characterHint">Choose a character to continue.</p>
+
+        <div class="character-actions">
+          <button type="button" class="character-back-button" id="backToDifficultyButton">← BACK</button>
+          <button type="button" class="login-button character-confirm-button" id="confirmCharacterButton" disabled>
+            CONFIRM CHARACTER →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="game-screen" id="gameScreen" aria-hidden="true" hidden>
+      <header class="game-header">
+        <div class="game-brand">
+          <span class="brand-icon">🎃</span>
+          <div>
+            <h2>HAUNTED ADVENTURE</h2>
+            <p>THE HALLOWEEN QUEST</p>
+          </div>
+        </div>
+
+        <div class="game-stats">
+          <div class="stat"><span>🎃</span><strong id="pumpkinCount">0 / 10</strong></div>
+          <div class="stat"><span>❤️</span><strong id="livesCount">3</strong></div>
+          <div class="stat difficulty-stat"><span>☠</span><strong id="currentDifficulty">NORMAL</strong></div>
+          <button id="restartButton" class="small-button" type="button">↻ RESTART</button>
+        </div>
+      </header>
+
+      <div class="game-intro">
+        <div>
+          <h1>THE CURSED FOREST</h1>
+          <p>Collect pumpkins. Escape the ghosts. Find the portal!</p>
+        </div>
+        <span class="level-tag">LEVEL 01</span>
+      </div>
+
+      <div class="game-frame">
+        <canvas id="gameCanvas" width="960" height="540" aria-label="Halloween platform game"></canvas>
+
+        <div class="game-message" id="gameMessage" hidden>
+          <div class="result-icon" id="resultIcon">🎃</div>
+          <p class="eyebrow" id="resultEyebrow">QUEST COMPLETE</p>
+          <h2 id="resultTitle">You Escaped!</h2>
+          <p id="resultDescription">The haunted forest is behind you.</p>
+          <p class="final-score" id="finalScore">Pumpkins collected: 0</p>
+          <button type="button" class="login-button" id="playAgainButton">CHOOSE AGAIN ↻</button>
+        </div>
+      </div>
+
+      <div class="game-controls">
+        <div class="control-info">
+          <strong>HOW TO PLAY</strong>
+          <p>Move: A / D or ← / → &nbsp; Jump: W / ↑ / SPACE</p>
+          <p>Collect 🎃 pumpkins, avoid 👻 ghosts, and reach the 🌀 portal.</p>
+        </div>
+
+        <div class="mobile-controls">
+          <button type="button" class="control-button" id="leftButton" aria-label="Move left">◀</button>
+          <button type="button" class="control-button" id="rightButton" aria-label="Move right">▶</button>
+          <button type="button" class="control-button jump-button" id="jumpButton" aria-label="Jump">⬆ JUMP</button>
+        </div>
+      </div>
+
+      <footer class="game-footer">
+        <span>🌙 NIGHTFALL</span>
+        <span>EXPLORE AT YOUR OWN RISK</span>
+      </footer>
+    </section>
+
+    <section class="ending-screen" id="endingScreen" aria-hidden="true" hidden>
+      <div class="ending-effects" aria-hidden="true">
+        <span class="ending-bat ending-bat-one">🦇</span>
+        <span class="ending-bat ending-bat-two">🦇</span>
+        <span class="ending-ghost ending-ghost-one">👻</span>
+        <span class="ending-ghost ending-ghost-two">👻</span>
+        <span class="ending-pumpkin ending-pumpkin-one">🎃</span>
+        <span class="ending-pumpkin ending-pumpkin-two">🎃</span>
+        <span class="ending-spark ending-spark-one">✦</span>
+        <span class="ending-spark ending-spark-two">✧</span>
+        <span class="ending-spark ending-spark-three">✦</span>
+      </div>
+
+      <div class="ending-content">
+        <p class="eyebrow">THE NIGHT HAS ENDED</p>
+        <h1>YOU ESCAPED!</h1>
+        <p class="ending-subtitle">The haunted forest will remember you...</p>
+
+        <div class="ending-photo-frame">
+          <img src="ending-photo.jpg" alt="Halloween adventure ending photo" id="endingPhoto">
+          <div class="photo-glow"></div>
+        </div>
+
+        <h2 class="the-end-title">THE END</h2>
+        <p class="ending-thanks">Thanks for playing Nightfall</p>
+        <button type="button" class="login-button" id="endingPlayAgainButton">PLAY AGAIN ↻</button>
+      </div>
+    </section>
+
+    <div class="ground">
+      <span class="pumpkin-small pumpkin-one">🎃</span>
+      <span class="pumpkin-small pumpkin-two">🎃</span>
+      <div class="tombstone tombstone-one">RIP</div>
+      <div class="tombstone tombstone-two">RIP</div>
+    </div>
+
+    <p class="copyright">© 2026 NIGHTFALL · HAPPY HALLOWEEN</p>
+
+    <div class="rotate-screen" id="rotateScreen" hidden>
+      <div class="rotate-card">
+        <div class="rotate-icon">📱</div>
+        <h2>Rotate Your Phone</h2>
+        <p>For the best Nightfall experience, turn your phone sideways to play in landscape mode.</p>
+        <p style="margin-top: 16px;">🎃 The haunted forest awaits...</p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
