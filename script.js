@@ -6,8 +6,8 @@ const LOGIN_PASSWORD = "sitaw";
 const LOGIN_STORAGE_KEY = "nightfall_logged_in";
 const TOTAL_PUMPKINS = 11;
 const WORLD_WIDTH = 2920;
-const VIEW_WIDTH = 960;
-const VIEW_HEIGHT = 440;
+let VIEW_WIDTH = 960;
+let VIEW_HEIGHT = 440;
 
 const loginScreen = $("loginCard");
 const loadingScreen = $("loadingScreen");
@@ -186,10 +186,19 @@ let resizeFrame = null;
 function configureCanvas() {
   if (!canvas || !ctx) return;
 
+  const frame = canvas.parentElement || canvas;
+  const availableWidth = Math.max(280, Math.min(frame.clientWidth || 960, 1500));
+  const targetHeight = Math.min(620, Math.max(220, availableWidth * 0.56));
+
+  VIEW_WIDTH = Math.round(availableWidth);
+  VIEW_HEIGHT = Math.round(targetHeight);
+
   canvas.width = VIEW_WIDTH;
   canvas.height = VIEW_HEIGHT;
 
   canvas.style.display = "block";
+  canvas.style.width = "100%";
+  canvas.style.height = "auto";
   canvas.style.maxWidth = "100%";
   canvas.style.touchAction = "none";
 
@@ -1134,10 +1143,14 @@ function drawPlayer() {
   const x = player.x;
   const y = player.y;
 
-  ctx.fillStyle = "#f2bd86";
+  ctx.save();
+  ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
+  ctx.shadowBlur = 8;
+
+  ctx.fillStyle = "#f5c79a";
   ctx.fillRect(x + 6, y + 4, 19, 17);
 
-  ctx.fillStyle = character.outfit;
+  ctx.fillStyle = "#2b1638";
   ctx.fillRect(x + 3, y, 25, 7);
   ctx.fillRect(x + 1, y + 5, 7, 8);
 
@@ -1155,12 +1168,16 @@ function drawPlayer() {
   ctx.fillStyle = character.color;
   ctx.fillRect(x + 5, y + 22, 21, 6);
 
-  ctx.fillStyle = "#20142f";
+  ctx.fillStyle = "#17111f";
   ctx.fillRect(x + 6, y + 34, 7, 8);
   ctx.fillRect(x + 19, y + 34, 7, 8);
 
+  ctx.strokeStyle = "rgba(255,255,255,0.22)";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x + 2, y + 2, 27, 40);
+
   if (selectedCharacter === "vampire") {
-    ctx.fillStyle = "#7f1738";
+    ctx.fillStyle = "#d7345b";
     ctx.beginPath();
     ctx.moveTo(x + 4, y + 20);
     ctx.lineTo(x + 15, y + 42);
@@ -1169,16 +1186,18 @@ function drawPlayer() {
   }
 
   if (selectedCharacter === "witch") {
-    ctx.fillStyle = "#241332";
+    ctx.fillStyle = "#2b1638";
     ctx.beginPath();
     ctx.moveTo(x + 2, y + 5);
     ctx.lineTo(x + 15, y - 14);
     ctx.lineTo(x + 28, y + 5);
     ctx.fill();
 
-    ctx.fillStyle = "#b86bff";
+    ctx.fillStyle = "#d9a6ff";
     ctx.fillRect(x + 7, y + 2, 16, 3);
   }
+
+  ctx.restore();
 }
 
 function drawPortal() {

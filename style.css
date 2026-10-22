@@ -74,7 +74,7 @@ svg {
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
-  padding: 70px 20px 85px;
+  padding: clamp(20px, 2vw, 42px) clamp(12px, 2vw, 28px) clamp(28px, 4vw, 80px);
   background:
     radial-gradient(ellipse at 75% 18%, #47234b 0, transparent 34%),
     radial-gradient(ellipse at 18% 60%, #29153e 0, transparent 42%),
@@ -1078,7 +1078,7 @@ button:disabled {
 .game-intro,
 .game-controls,
 .game-footer {
-  width: min(100%, 1000px);
+  width: min(100%, 1200px);
 }
 
 .game-header {
@@ -1183,7 +1183,7 @@ button:disabled {
 
 .game-frame {
   position: relative;
-  width: min(100%, 1000px);
+  width: min(100%, 1200px);
   overflow: hidden;
   border: 1px solid #70425e;
   border-radius: 8px;
