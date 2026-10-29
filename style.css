@@ -1,4 +1,3 @@
-
 :root {
   --bg: #10091c;
   --panel: #171020;
@@ -2225,4 +2224,141 @@ button:disabled {
     scroll-behavior: auto !important;
     transition-duration: .01ms !important;
   }
+}
+
+/* =====================================================================
+   GAME FIT FIX
+   Keep this block at the very bottom so it overrides the older rules.
+   ===================================================================== */
+
+/* Desktop / tablet / portrait: size the game so everything fits the screen height */
+.game-screen {
+  --game-w: min(100%, 1200px, max(320px, calc((100dvh - 330px) * 2.1818)));
+  gap: 12px;
+  padding: 16px 14px;
+}
+
+.game-header,
+.game-intro,
+.game-controls,
+.game-footer {
+  width: var(--game-w);
+}
+
+.game-frame {
+  width: var(--game-w);
+  aspect-ratio: 960 / 440;
+}
+
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
+/* Phones in landscape (any width): compact layout, game fills the middle */
+@media screen and (orientation: landscape) and (max-height: 520px),
+       screen and (orientation: landscape) and (max-width: 900px) {
+
+  .game-screen:not([hidden]) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 4px;
+    height: 100vh;
+    height: 100dvh;
+    padding:
+      max(4px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(4px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+    overflow: hidden;
+    background: #10091c;
+  }
+
+  .game-intro,
+  .game-footer,
+  .game-brand p {
+    display: none;
+  }
+
+  .game-header,
+  .game-frame,
+  .game-controls {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .game-header {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  .brand-icon { font-size: 20px; }
+  .game-brand h2 { font-size: 11px; }
+
+  .game-stats {
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+
+  .stat {
+    gap: 3px;
+    padding: 4px 6px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .stat strong { font-size: 10px; }
+
+  .small-button {
+    padding: 5px 8px;
+    font-size: 9px;
+    white-space: nowrap;
+  }
+
+  .game-frame {
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .game-controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  .control-info strong { font-size: 10px; }
+  .control-info p { margin-top: 1px; font-size: 8px; line-height: 1.3; }
+
+  .mobile-controls { gap: 8px; }
+
+  .control-button {
+    flex: initial;
+    min-width: 52px;
+    min-height: 38px;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .jump-button { min-width: 80px; }
+
+  .game-message { gap: 5px; padding: 10px; }
+  .result-icon { font-size: 25px; }
+  .game-message h2 { font-size: 25px; }
+  .game-message p { font-size: 10px; }
+  .game-message .login-button { min-width: 130px; min-height: 35px; font-size: 10px; }
 }

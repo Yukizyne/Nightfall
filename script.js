@@ -1,4 +1,3 @@
-
 const $ = id => document.getElementById(id);
 
 const LOGIN_EMAIL = "pandak";
@@ -6,8 +5,11 @@ const LOGIN_PASSWORD = "sitaw";
 const LOGIN_STORAGE_KEY = "nightfall_logged_in";
 const TOTAL_PUMPKINS = 11;
 const WORLD_WIDTH = 2920;
-let VIEW_WIDTH = 960;
-let VIEW_HEIGHT = 440;
+
+// Fixed game size. CSS scales the canvas to fit any screen.
+const VIEW_WIDTH = 960;
+const VIEW_HEIGHT = 440;
+let renderScale = 1;
 
 const loginScreen = $("loginCard");
 const loadingScreen = $("loadingScreen");
@@ -186,21 +188,18 @@ let resizeFrame = null;
 function configureCanvas() {
   if (!canvas || !ctx) return;
 
-  const frame = canvas.parentElement || canvas;
-  const availableWidth = Math.max(280, Math.min(frame.clientWidth || 960, 1500));
-  const targetHeight = Math.min(620, Math.max(220, availableWidth * 0.56));
+  // The game always runs at VIEW_WIDTH x VIEW_HEIGHT. We only raise the
+  // internal resolution on high-DPI screens so it stays sharp. CSS handles
+  // fitting the canvas into the available space.
+  renderScale = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
 
-  VIEW_WIDTH = Math.round(availableWidth);
-  VIEW_HEIGHT = Math.round(targetHeight);
+  const w = Math.round(VIEW_WIDTH * renderScale);
+  const h = Math.round(VIEW_HEIGHT * renderScale);
 
-  canvas.width = VIEW_WIDTH;
-  canvas.height = VIEW_HEIGHT;
-
-  canvas.style.display = "block";
-  canvas.style.width = "100%";
-  canvas.style.height = "auto";
-  canvas.style.maxWidth = "100%";
-  canvas.style.touchAction = "none";
+  if (canvas.width !== w || canvas.height !== h) {
+    canvas.width = w;
+    canvas.height = h;
+  }
 
   drawGame();
 }
@@ -215,14 +214,7 @@ function resizeGame() {
 
     if (!canvas || !ctx) return;
 
-    if (canvas.width !== VIEW_WIDTH || canvas.height !== VIEW_HEIGHT) {
-      canvas.width = VIEW_WIDTH;
-      canvas.height = VIEW_HEIGHT;
-    }
-
-    if (gameRunning) {
-      drawGame();
-    } else if (player && platforms.length) {
+    if (player && platforms.length) {
       drawGame();
     }
 
@@ -921,7 +913,7 @@ function updateHunterAnimation(delta) {
 function drawGame() {
   if (!ctx || !canvas || !player) return;
 
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.setTransform(renderScale, 0, 0, renderScale, 0, 0);
   ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 
   const sky = ctx.createLinearGradient(0, 0, 0, VIEW_HEIGHT);
